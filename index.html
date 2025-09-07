@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Kanban Board</title>
+
+<link rel="stylesheet" href="./css/styles.css">
+
+<script src="./js/main.js"></script>
+
+</head>
+
+<body>
+  <h1 class="heading">Kanban Board</h1>
+
+  <div>
+    <div style="border: 0px; margin-top: 3%;">
+      <button class="dialogButton" onclick="hideToggle()">Add new task +</button>
+
+      <div class="theFormDiv" id="theFormDivId">
+
+        <!-- <form action=""> -->
+        <label for="task-title">Title</label>
+        <input type="text" id="title" name="task-title" placeholder="Give a title...">
+
+        <label for="task-description">Description</label>
+        <input type="text" id="description" name="task-description" placeholder="Describe task...">
+        <label for="assigned-to">Assigned to</label>
+        <select id="assigned" name="assigned-to">
+          <option value="pekka">Pekka</option>
+          <option value="mikko">Mikko</option>
+          <option value="viljami">Viljami</option>
+          <option value="antti">Antti</option>
+        </select>
+
+        <label for="state">State</label>
+        <select id="state-id" name="state">
+          <option value="upcoming">Upcoming</option>
+          <option value="starting">Starting</option>
+          <option value="working">Working</option>
+          <option value="ready">Ready</option>
+
+        </select>
+
+        <button onclick="addNewTask()">Create</button>
+        <!-- <button onclick="window.myDialog.close();">close</button> -->
+        <!--  </form> -->
+
+      </div>
+
+      <!--
+
+
+
+<dialog id="myDialog">
+
+    <form>
+    <label for="task-title">Title</label>
+    <input type="text" id="title" name="task-title" placeholder="Give a title...">
+
+    <label for="task-description">Description</label>
+    <input type="text" id="description" name="task-description" placeholder="Describe task...">
+    <label for="assigned-to">Assigned to</label>
+    <select id="assigned" name="assigned-to">
+      <option value="pekka">Pekka</option>
+      <option value="mikko">Mikko</option>
+      <option value="viljami">Viljami</option>
+      <option value="antti">Antti</option>
+    </select>
+  
+<label for="state">State</label>
+    <select id="state-id" name="state">
+      <option value="upcoming">Upcoming</option>
+      <option value="starting">Starting</option>
+      <option value="working">Working</option>
+      <option value="ready">Ready</option>
+
+    </select>
+
+    <button onclick="addNewTask()">Create</button>
+    <button onclick="window.myDialog.close();">close</button>
+  </form>
+  
+</dialog>
+
+-->
+
+    </div>
+    <br>
+
+    <div class="mycontainer">
+
+
+
+      <div id="div-upcoming" style="background-color:#cfcece;">
+        <h2>Upcoming</h2>
+        <p>This is a place in the board for a task that hasn't yet begun.</p>
+        <!-- <p class="newUpcoming" id="newUpcoming" style="background-color:#cfcece; border:solid black 1px; width: 200px; inline-size: 150px; overflow-wrap: break-word;"></p> -->
+        
+      </div>
+      
+        <!-- <div class="upFlex" id="upFlex"></div> -->
+
+      <div id="div-starting" style="background-color:#4df323;">
+        <h2>Starting</h2>
+        <p>The task has been assigned but is not yet in the process.</p>
+
+        <p class="newStarting" id="newStarting"></p>
+
+      </div>
+
+      <div id="div-working" style="background-color:#f1bc10;">
+        <h2>Working</h2>
+        <p>The task is currently being worked on and assigned for a worker.</p>
+
+        <p class="newWorking" id="newWorking"></p>
+
+      </div>
+
+      <div id="div-ready" style="background-color:#ac0707;">
+        <h2>Ready</h2>
+        <p>The task has been completed and all of its goals were accomplished.</p>
+
+        <p class="newReady" id="newReady" style="background-color:#ac0707;"></p>
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+<p id="newError"></p>
+
+</body>
+
+</html>
