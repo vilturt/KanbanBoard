@@ -69,8 +69,8 @@ div.mycontainer {
 
   .newUpDeleteBut {
     position: absolute;
-    left: 120px;
-    top: 10px;
+    left:88%;
+    top: 0px;
   }
 
   .upFlex {
@@ -85,7 +85,9 @@ div.mycontainer {
      /*top: 100px; */
     left: 0px;
     position: absolute;
-    width: 200px; 
-    inline-size: 150px;
+    width: 23%;
+    inline-size: 100%;
     overflow-wrap: break-word;
+    display: inline;
+//    background: #cfcece;
   }

@@ -1,8 +1,21 @@
 
 let elementsup = [];
 let elementsstart = [];
+let elementswork = [];
+let elementsready = [];
 
 let y = [100,100,100,100];//document.getElementById("div-upcoming").offsetHeight;
+
+function sety(parent,elements,typeofelem) {
+  let y2 = parent.offsetHeight;
+  for (i=0;i<elements.length;i++) {
+    let elem = elements[i];
+    let ytmp = y2.toString()+"px";
+    elem.style.top = ytmp;
+    y2+= elem.offsetHeight+20;
+  }
+  y[typeofelem] = y2;
+}
 
 function deleteelementfromelems(elements,id,typeofelem) {
   for (i=0;i<elements.length;i++) {
@@ -13,17 +26,25 @@ function deleteelementfromelems(elements,id,typeofelem) {
       break;
     }
   }
-  let y2 = 100;
-  for (i=0;i<elements.length;i++) {
-    let elem = elements[i];
-    let ytmp = y2.toString()+"px";
-    elem.style.top = ytmp;
-    y2+= elem.offsetHeight;
+  if (elements.length>=1) {
+    let parent = elements[0].parentElement;
+    sety(parent,elements,typeofelem);
   }
-  y[typeofelem] = y2;
 }
 
 let upcoming_button = 0;
+
+window.addEventListener('resize', function () {
+  let parent = document.getElementById("div-upcoming");  
+  sety(parent,elementsup,0);
+  parent = document.getElementById("div-starting");  
+  sety(parent,elementsstart,1);
+  parent = document.getElementById("div-working");  
+  sety(parent,elementswork,2);
+  parent = document.getElementById("div-ready");  
+  sety(parent,elementsready,3);
+});
+
 /*
 
 let numUpcoming = 0;
@@ -66,6 +87,9 @@ let UpcomingHeight =
     newCloseButton.appendChild(document.createTextNode("X"));
     newCloseButton.id = upcoming_button;
 
+    newCloseButton.classList.add("newUpDeleteBut");
+
+
     //newCloseButton.addEventListener('click', function(event) {
        //let elem = document.getElementById(event.target.id);
        //elem = elem.parentElement;
@@ -88,83 +112,98 @@ let UpcomingHeight =
          deleteelementfromelems(elementsup,event.target.id,0);
       });
 
-     // let yHeight = numUpcoming * 
+      //console.log(newPElement.style.backgroundColor);
+      newPElement.style.backgroundColor = "#cfcece";
+      const pElementMain = document.getElementById("div-upcoming");
 
-      //let theReturnString = theTitleOfTheTask + theDescriptionOfTheTask + theAssignedPerson + theStateOfTheTask;
-      // document.getElementById("newUpcoming").innerHTML += "<h2>" + theTitleOfTheTask + "</h2><button>X</button><p>" + theDescriptionOfTheTask + "</p><p>Assigned to: " + theAssignedPerson + "</p><hr>";
-      
-      
-      //const newBrElement = document.createElement("br");
-   //   const newPElement = document.createElement("p");
+      if (elementsup.length==1) {
+	 y[0]=pElementMain.offsetHeight;
+      }
 
-    //  newPElement.classList.add("pModifiedCss");
-
-     // const newTitleNode = document.createTextNode(theTitleOfTheTask);
-
-      //const newDescptNode = document.createTextNode("Description: " + theDescriptionOfTheTask);
-
-      //const newAssignedToNode = document.createTextNode("<b>" + theAssignedPerson + "</b>");
-
-      //const newCloseButton = document.createElement("button");
-
-
-
-     // newPElement.appendChild(newTitleNode);
-      //newPElement.style.left = "0px";
-      //newPElement.style.position = "absolute";
-     //newPElement.style.top = "200px";
-
-     // adding more elements...
-
-/*
-
-     const newButtonText = document.createTextNode("X");
-     const newButton = document.createElement("button");
-     newButton.appendChild(newButtonText);
-     pElementMain.appendChild(newButton);
-  
-*/
       let ytmp = y[0].toString()+"px";
 
       newPElement.style.top = ytmp;
-
-      // newPElement.style.setProperty("top","${ytmp}px");
       
-      //newBrElement.style.backgroundColor = "yellow";
-      const pElementMain = document.getElementById("div-upcoming");
-      // pElementMain.appendChild(newBrElement);
       pElementMain.appendChild(newPElement);
-      
-      y[0]+=100;
+
+      y[0]+=newPElement.offsetHeight+20;
+
     } else if (theStateOfTheTask === "starting") {
       elementsstart.push(newPElement);
       newCloseButton.addEventListener('click', function(event) {
          deleteelementfromelems(elementsstart,event.target.id,1);
       });
-      console.log("start")
+      //console.log("start")
+
+      const pElementMain = document.getElementById("div-starting");
+
       
+      if (elementsstart.length==1) {
+	 y[1]=pElementMain.offsetHeight;
+      }
+
+
       let ytmp = y[1].toString()+"px";
 
       newPElement.style.top = ytmp;
+      newPElement.style.backgroundColor = "#4df323";
 
-      // newPElement.style.setProperty("top","${ytmp}px");
-      
-      //newBrElement.style.backgroundColor = "yellow";
-      const pElementMain = document.getElementById("div-starting");
-      // pElementMain.appendChild(newBrElement);
       pElementMain.appendChild(newPElement);
-      y[1]+=100;
-
-      //let theReturnString = theTitleOfTheTask + theDescriptionOfTheTask + theAssignedPerson + theStateOfTheTask;
-      //document.getElementById("newStarting").innerHTML += "<h2>" + theTitleOfTheTask + "</h2><br><p>Assigned to: " + theAssignedPerson + "</p>";
+      y[1]+=newPElement.offsetHeight+20;
 
     } else if (theStateOfTheTask === "working") {
+      console.log("wroking");
+      elementswork.push(newPElement);
+      newCloseButton.addEventListener('click', function(event) {
+         deleteelementfromelems(elementswork,event.target.id,2);
+      });
+      //console.log("start")
+
+      const pElementMain = document.getElementById("div-working");
+
+      if (elementswork.length==1) {
+	 y[2]=pElementMain.offsetHeight;
+      }
+
+    
+      let ytmp = y[2].toString()+"px";
+
+      newPElement.style.top = ytmp;
+
+      newPElement.style.backgroundColor = "#f1bc10";
+
+      pElementMain.appendChild(newPElement);
+      y[2]+=newPElement.offsetHeight+20;
+
+
       //let theReturnString = theTitleOfTheTask + theDescriptionOfTheTask + theAssignedPerson + theStateOfTheTask;
-      document.getElementById("newWorking").innerHTML += "<h2>" + theTitleOfTheTask + "</h2><br><p>Assigned to: " + theAssignedPerson + "</p>";
+//      document.getElementById("newWorking").innerHTML += "<h2>" + theTitleOfTheTask + "</h2><br><p>Assigned to: " + theAssignedPerson + "</p>";
 
     } else if (theStateOfTheTask === "ready") {
       //let theReturnString = theTitleOfTheTask + theDescriptionOfTheTask + theAssignedPerson + theStateOfTheTask;
-      document.getElementById("newReady").innerHTML += "<h2>" + theTitleOfTheTask + "</h2><br><p>Assigned to: " + theAssignedPerson + "</p>";
+      //document.getElementById("newReady").innerHTML += "<h2>" + theTitleOfTheTask + "</h2><br><p>Assigned to: " + theAssignedPerson + "</p>";
+
+      elementsready.push(newPElement);
+      newCloseButton.addEventListener('click', function(event) {
+         deleteelementfromelems(elementsready,event.target.id,3);
+      });
+
+      const pElementMain = document.getElementById("div-ready");
+
+      if (elementsready.length==1) {
+	 y[3]=pElementMain.offsetHeight;
+      }
+
+    
+      let ytmp = y[3].toString()+"px";
+
+      newPElement.style.top = ytmp;
+
+      newPElement.style.backgroundColor = "#ac0707";
+
+      pElementMain.appendChild(newPElement);
+      y[3]+=newPElement.offsetHeight+20;
+
 
     } else {
       document.getElementById("newError").innerHTML += "Error occurred!";
