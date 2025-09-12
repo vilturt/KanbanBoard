@@ -1,10 +1,16 @@
-
 let elementsup = [];
 let elementsstart = [];
 let elementswork = [];
 let elementsready = [];
 
 let y = [100,100,100,100];//document.getElementById("div-upcoming").offsetHeight;
+
+let theTitleOfTheTask;
+let theDescriptionOfTheTask;
+let theAssignedPerson;
+let theStateOfTheTask;
+
+let frombutton = 0;
 
 function sety(parent,elements,typeofelem) {
   let y2 = parent.offsetHeight;
@@ -80,10 +86,6 @@ function setdestside(ev,oldparent,sdest, elements,num,color) {
   if ((ev.target.parentElement.id==sdest) || (ev.target.id==sdest)) {
      elements.push(dragged);
      let parent = document.getElementById(sdest);  
-//     console.log(dragged.children[1].id);
-//     dragged.children[1].onclick = null;
-     //dragged.children[0].removeAttribute("onclick");
-     //dragged.children[1].removeAttribute("onclick");
      if (oldparent.id=="div-upcoming") {
        dragged.children[1].removeEventListener("click",deleteup);
      }
@@ -151,70 +153,179 @@ function dropHandler(ev) {
      deleteelementfromelems(elementsready,dragged.id,3,1);
   }
 
-/*  if ((ev.target.parentElement.id=="div-starting") || (ev.target.id=="div-starting")) {
-        elementsstart.push(dragged);
-        let parent = document.getElementById("div-starting");  
-        dragged.children[1].addEventListener('click', function(event) {
-           deleteelementfromelems(elementsstart,dragged.id,1,0);
-        });
-        dragged.style.backgroundColor = "#4df323";
-        sety(parent,elementsstart,1);
-  }*/
   setdestside(ev,oldparent,"div-upcoming",elementsup,0,"#cfcece");
   setdestside(ev,oldparent,"div-starting",elementsstart,1,"#4df323");
   setdestside(ev,oldparent,"div-working",elementswork,2,"#f1bc10");
   setdestside(ev,oldparent,"div-ready",elementsready,3,"#ac0707");
 
-//  console.log(ev.target);
-  return;
+}
 
-  const data = ev.dataTransfer.getData("text");
-  //console.log("parentx"+document.getElementById(data).parentElement.id);
-  const idsrc = document.getElementById(data).parentElement.id;
-//  document.getElementById(data).parentElement.removeChild(document.getElementById(data));
-  ev.target.appendChild(document.getElementById(data));
-  const idsrc2 = document.getElementById(data).parentElement.nodeName;
+let filename = "";
+let objectURL;
 
-//  console.log("dataid:"+data);
-  let parent = document.getElementById("div-upcoming");    
-  console.log("ev.target"+ev.target.nodeName);
-  console.log("parent"+parent.id);
-  console.log("idsrc"+idsrc);
-  console.log("idsrc2"+idsrc2);
-  if (idsrc==parent.id) {
-     deleteelementfromelems(elementsup,data,0,1);
-     console.log("here!");
+function addtofile(elements,elemadd) {
+  let contents = ""
+  contents += elemadd+"\n";
+  for (let i=0;i<elements.length;i++) {
+      console.log(elements[i].children[0].innerHTML);
+      contents += elements[i].children[0].innerHTML+"\n";
+      contents += elements[i].children[2].innerHTML.substring(13)+"\n";
+      contents += elements[i].children[3].innerHTML+"\n";
   }
-//  parent = document.getElementById("div-start");    
-//  if (ev.target==parent) {
-//     deleteelementfromelems(elementsstart,data,0,1);
-//  }
+  return contents;
+}
 
-  if (ev.target.id=="div-starting") {
-        console.log("HERE2");
-	elementsstart.push(document.getElementById(data));
-	console.log(elementsstart.length);
-        parent = document.getElementById("div-starting");  
-        document.getElementById(data).children[1].addEventListener('click', function(event) {
-           deleteelementfromelems(elementsstart,event.target.id,1,0);
-           console.log("asdf delete");
-        });
+async function getNewFileHandle(event) {
+  const opts = {
+    types: [
+      {
+        description: "Text file",
+        accept: { "text/plain": [".txt"] },
+      },
+    ],
+  };
+  try {
+    let contents = "";
+    contents += addtofile(elementsup,"UP");
+    contents += addtofile(elementsstart,"START");
+    contents += addtofile(elementswork,"WORK");
+    contents += addtofile(elementsready,"READY");
+    contents += "END\n";
+    const fileHandle = await window.showSaveFilePicker(opts);
+    console.log(fileHandle);
+    const writable = await fileHandle.createWritable();
+    // Write the contents of the file to the stream.
+    await writable.write(contents);
+    // Close the file and write the contents to disk.
+    await writable.close();
+  } catch (e) {
+    console.log("cancelled");
+  }
+}
 
+function readonetopicdata(i,lines,topic,topic2,elements,stateoftask) {
+  for (j=0;j<elements.length;j++) {
+    let elem = elements[j];
+    elem.remove();
+    elements.splice(j, 1);
+    j--;
+  }
+  if (stateoftask=="upcoming") {
+    parent = document.getElementById("div-upcoming");
+    y[0] = parent.offsetHeight;
+  }
+  if (stateoftask=="starting") {
+    parent = document.getElementById("div-starting");
+    y[1] = parent.offsetHeight;
+  }
+  if (stateoftask=="working") {
+    parent = document.getElementById("div-working");
+    y[2] = parent.offsetHeight;
+  }
+  if (stateoftask=="ready") {
+    parent = document.getElementById("div-ready");
+    y[3] = parent.offsetHeight;
+  }
+  if (lines[i]!=topic) {
+     return -1;
+  }
+  i++;
+  theStateOfTheTask = stateoftask;
+  for (;i<lines.length;i+=3) {
+     if (lines[i]==topic2)
+	break;
+     theTitleOfTheTask = lines[i];
+     theDescriptionOfTheTask = lines[i+1];
+     theAssignedPerson = lines[i+2];
+     addNewTask();
+  }
+  //console.log(stateoftask+" elementsup: "+elementsup.length);
+  return i;
+}
+   
 
-        sety(parent,elementsstart,1);
-   }
+async function Loadfile(event) {
+  const opts = {
+    types: [
+      {
+        description: "Text file",
+        accept: { "text/plain": [".txt"] },
+      },
+    ],
+    excludeAcceptAllOption: true,
+    multiple: false,
+  };
+  try {
+//    let contents = "";
+ //   contents += addtofile(elementsup,"UP");
+ //   contents += addtofile(elementsstart,"START");
+  //  contents += addtofile(elementswork,"WORK");
+   // contents += addtofile(elementsready,"READY");
+    const [fileHandle] = await window.showOpenFilePicker(opts);
+    console.log(fileHandle);
+    const fileData = await fileHandle.getFile();
+    // Write the contents of the file to the stream.
+    console.log(fileData);
+    contents = await fileData.text();
+    console.log(contents);
+    var lines = contents.split('\n');
+    frombutton = 1;
+    let i = 0;
+    i = readonetopicdata(i,lines,"UP","START",elementsup,"upcoming");
+    if (i==-1) {
+       alert("Invalid file");
+       frombutton = 0;
+       return;
+    }
+    i = readonetopicdata(i,lines,"START","WORK",elementsstart,"starting");
+    if (i==-1) {
+       alert("Invalid file");
+       frombutton = 0;
+       return;
+    }
+    i = readonetopicdata(i,lines,"WORK","READY",elementswork,"working");
+    if (i==-1) {
+       alert("Invalid file");
+       frombutton = 0;
+       return;
+    }
+    i = readonetopicdata(i,lines,"READY","END",elementsready,"ready");
+    if (i==-1) {
+       alert("Invalid file");
+       frombutton = 0;
+       return;
+    }    
+    frombutton = 0;
+  } catch (e) {
+    console.log("cancelled");
+  }
+}
 
 
 /*
-  sety(parent,elementsup,0);
-  parent = document.getElementById("div-starting");  
-  sety(parent,elementsstart,1);
-  parent = document.getElementById("div-working");  
-  sety(parent,elementswork,2);
-  parent = document.getElementById("div-ready");  
-  sety(parent,elementsready,3);*/
 
+
+    const d = document.getElementById("test");
+    let f = event.target.files[0];
+    console.log(f);
+    filename = f.name;
+//    localStorage.setItem("ifile",f.name);
+//    let addnewimg = document.createElement("img");
+    objectURL = URL.createObjectURL(event.target.files[0]);
+//    d.appendChild(addnewimg);   
 }
+
+function save(event) {
+  var htmlContent = ["your-content-here"];
+  var bl = new Blob(htmlContent, {type: "text/html"});
+  var a = document.createElement("a");
+  a.href = objectURL;//URL.createObjectURL(bl);
+  a.download = filname;//"your-download-name-here.html";
+  a.hidden = true;
+  document.body.appendChild(a);
+  a.innerHTML = "something random - nobody will see this, it doesn't matter what you put here";
+  a.click();
+}*/
 
 let startindex = 0;
 
@@ -226,13 +337,18 @@ let numUpcoming = 0;
 
 let UpcomingHeight = 
 */
+ 
+  
+
   function addNewTask() {
     //window.alert("Hello!");
 
-    let theTitleOfTheTask = document.getElementById("title").value;
-    let theDescriptionOfTheTask = document.getElementById("description").value;
-    let theAssignedPerson = document.getElementById("assigned").value;
-    let theStateOfTheTask = document.getElementById("state-id").value;
+    if (frombutton==0) {
+         theTitleOfTheTask = document.getElementById("title").value;
+         theDescriptionOfTheTask = document.getElementById("description").value;
+         theAssignedPerson = document.getElementById("assigned").value;
+         theStateOfTheTask = document.getElementById("state-id").value;
+     }
 
     //window.alert(theTitleOfTheTask + theDesciptionOfTheTask + theAssignedPerson + theStateOfTheTask);
 
@@ -271,10 +387,13 @@ let UpcomingHeight =
     const newH2Element = document.createElement("h2");
     newH2Element.appendChild(newTitleNode);
 
-    const newDescptNode = document.createTextNode("Description: " + theDescriptionOfTheTask);
+//    const newDescptNode = document.createTextNode("Description: " + theDescriptionOfTheTask);
 
+    const newD = document.createElement("p");
+    newD.appendChild(document.createTextNode("Description: " + theDescriptionOfTheTask));
 
-    const newAssignedToNode = document.createTextNode(theAssignedPerson);
+    const newA = document.createElement("p");
+    newA.appendChild(document.createTextNode(theAssignedPerson));
 
     const newCloseButton = document.createElement("button");
     newCloseButton.appendChild(document.createTextNode("X"));
@@ -303,6 +422,9 @@ let UpcomingHeight =
     
       newPElement.appendChild(newH2Element);
       newPElement.appendChild(newCloseButton);
+      newPElement.appendChild(newD);
+      newPElement.appendChild(newA);
+
       newPElement.id = upcoming_button++;
 
     if (theStateOfTheTask === "upcoming") {
