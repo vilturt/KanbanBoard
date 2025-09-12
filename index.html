@@ -93,36 +93,29 @@
 
 
 
-      <div id="div-upcoming" style="background-color:#cfcece;">
-        <h2>Upcoming</h2>
-        <p>This is a place in the board for a task that hasn't yet begun.</p>
-        <!-- <p class="newUpcoming" id="newUpcoming" style="background-color:#cfcece; border:solid black 1px; width: 200px; inline-size: 150px; overflow-wrap: break-word;"></p> -->
+      <div id="div-upcoming" ondragover='dragoverHandler(event)' ondrop='dropHandler(event)'  style="background-color:#cfcece;">
+        <h2 id="div-upcoming2">Upcoming</h2>
+        <p id="div-upcoming2">This is a place in the board for a task that hasn't yet begun.</p>
         
       </div>
       
         <!-- <div class="upFlex" id="upFlex"></div> -->
 
-      <div id="div-starting" style="background-color:#4df323;">
-        <h2>Starting</h2>
-        <p>The task has been assigned but is not yet in the process.</p>
-
-        <p class="newStarting" id="newStarting"></p>
+      <div id="div-starting" ondragover='dragoverHandler(event)' ondrop='dropHandler(event)'  style="background-color:#4df323;">
+        <h2 id="div-starting2">Starting</h2>
+        <p id="div-starting2">The task has been assigned but is not yet in the process.</p>
 
       </div>
 
-      <div id="div-working" style="background-color:#f1bc10;">
-        <h2>Working</h2>
-        <p>The task is currently being worked on and assigned for a worker.</p>
-
-        <p class="newWorking" id="newWorking"></p>
+      <div id="div-working" ondragover='dragoverHandler(event)' ondrop='dropHandler(event)'  style="background-color:#f1bc10;">
+        <h2 id="div-working2">Working</h2>
+        <p id="div-working2">The task is currently being worked on and assigned for a worker.</p>
 
       </div>
 
-      <div id="div-ready" style="background-color:#ac0707;">
-        <h2>Ready</h2>
-        <p>The task has been completed and all of its goals were accomplished.</p>
-
-        <p class="newReady" id="newReady" style="background-color:#ac0707;"></p>
+      <div id="div-ready" ondragover='dragoverHandler(event)' ondrop='dropHandler(event)'  style="background-color:#ac0707;">
+        <h2 id="div-ready2">Ready</h2>
+        <p id="div-ready2">The task has been completed and all of its goals were accomplished.</p>
 
       </div>
 

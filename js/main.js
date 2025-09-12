@@ -17,11 +17,13 @@ function sety(parent,elements,typeofelem) {
   y[typeofelem] = y2;
 }
 
-function deleteelementfromelems(elements,id,typeofelem) {
+function deleteelementfromelems(elements,id,typeofelem,flag) {
   for (i=0;i<elements.length;i++) {
     let elem = elements[i];
     if (elem.id==id) {
-      elem.remove();
+      if (flag==0) {
+	elem.remove();
+      }
       elements.splice(i, 1);
       break;
     }
@@ -45,6 +47,179 @@ window.addEventListener('resize', function () {
   sety(parent,elementsready,3);
 });
 
+function dragoverHandler(ev) {
+  ev.preventDefault();
+}
+
+function deleteup(event) {
+   console.log(elementsup);
+   console.log(event.target);
+   deleteelementfromelems(elementsup,event.target.id,0,0);
+   console.log("upcoming delete");
+}
+
+function deletestart(event) {
+   deleteelementfromelems(elementsstart,event.target.id,1,0);
+   console.log("start delete");
+}
+
+function deleteready(event) {
+   deleteelementfromelems(elementsready,event.target.id,2,0);
+   console.log("ready delete");
+}
+
+function deletework(event) {
+   deleteelementfromelems(elementswork,event.target.id,3,0);
+   console.log("work delete");
+}
+
+function setdestside(ev,oldparent,sdest, elements,num,color) {
+  //console.log(ev.target.parentElement.id);
+  //console.log(ev.target.id);
+  //if (((ev.target.parentElement.id==sdest) && (ev.target.id==sdest+"2")) || (ev.target.id==sdest)) {
+  if ((ev.target.parentElement.id==sdest) || (ev.target.id==sdest)) {
+     elements.push(dragged);
+     let parent = document.getElementById(sdest);  
+//     console.log(dragged.children[1].id);
+//     dragged.children[1].onclick = null;
+     //dragged.children[0].removeAttribute("onclick");
+     //dragged.children[1].removeAttribute("onclick");
+     if (oldparent.id=="div-upcoming") {
+       dragged.children[1].removeEventListener("click",deleteup);
+     }
+     if (oldparent.id=="div-starting") {
+       dragged.children[1].removeEventListener("click",deletestart);
+     }
+     if (oldparent.id=="div-working") {
+       dragged.children[1].removeEventListener("click",deletework);
+     }
+     if (oldparent.id=="div-ready") {
+       dragged.children[1].removeEventListener("click",deleteready);
+     }
+
+     if (sdest=="div-upcoming") {
+       dragged.children[1].addEventListener('click', deleteup);
+     }
+     if (sdest=="div-starting") {
+       dragged.children[1].addEventListener('click', deletestart);
+     }
+     if (sdest=="div-working") {
+       dragged.children[1].addEventListener('click', deletework);
+     }
+     if (sdest=="div-ready") {
+       dragged.children[1].addEventListener('click', deleteready);
+     }
+     dragged.style.backgroundColor = color;
+     sety(parent,elements,num);
+   }
+}
+
+function dropHandler(ev) {
+  //ev.preventDefault();
+  oldparent = dragged.parentNode;
+
+  if ((ev.target.id!="div-upcoming") && (ev.target.id!="div-upcoming2") &&
+      (ev.target.id!="div-starting") && (ev.target.id!="div-starting2") &&
+      (ev.target.id!="div-working") && (ev.target.id!="div-working2") &&
+      (ev.target.id!="div-ready") && (ev.target.id!="div-ready2")) {
+	return
+   }
+
+  //console.log(ev.target.id);
+  //console.log(ev.target.parentElement.id);
+  //console.log(ev.target.nodeName);
+
+  dragged.parentNode.removeChild(dragged);
+
+  if ((ev.target.id=="div-upcoming") || (ev.target.id=="div-starting") ||
+      (ev.target.id=="div-working") || (ev.target.id=="div-working2")) {
+    ev.target.appendChild(dragged);
+  } else {
+    ev.target.parentElement.appendChild(dragged);
+  }
+
+  if (oldparent.id=="div-upcoming") {
+     deleteelementfromelems(elementsup,dragged.id,0,1);
+  }
+  if (oldparent.id=="div-starting") {
+     deleteelementfromelems(elementsstart,dragged.id,1,1);
+  }
+  if (oldparent.id=="div-working") {
+     deleteelementfromelems(elementswork,dragged.id,2,1);
+  }
+  if (oldparent.id=="div-ready") {
+     deleteelementfromelems(elementsready,dragged.id,3,1);
+  }
+
+/*  if ((ev.target.parentElement.id=="div-starting") || (ev.target.id=="div-starting")) {
+        elementsstart.push(dragged);
+        let parent = document.getElementById("div-starting");  
+        dragged.children[1].addEventListener('click', function(event) {
+           deleteelementfromelems(elementsstart,dragged.id,1,0);
+        });
+        dragged.style.backgroundColor = "#4df323";
+        sety(parent,elementsstart,1);
+  }*/
+  setdestside(ev,oldparent,"div-upcoming",elementsup,0,"#cfcece");
+  setdestside(ev,oldparent,"div-starting",elementsstart,1,"#4df323");
+  setdestside(ev,oldparent,"div-working",elementswork,2,"#f1bc10");
+  setdestside(ev,oldparent,"div-ready",elementsready,3,"#ac0707");
+
+//  console.log(ev.target);
+  return;
+
+  const data = ev.dataTransfer.getData("text");
+  //console.log("parentx"+document.getElementById(data).parentElement.id);
+  const idsrc = document.getElementById(data).parentElement.id;
+//  document.getElementById(data).parentElement.removeChild(document.getElementById(data));
+  ev.target.appendChild(document.getElementById(data));
+  const idsrc2 = document.getElementById(data).parentElement.nodeName;
+
+//  console.log("dataid:"+data);
+  let parent = document.getElementById("div-upcoming");    
+  console.log("ev.target"+ev.target.nodeName);
+  console.log("parent"+parent.id);
+  console.log("idsrc"+idsrc);
+  console.log("idsrc2"+idsrc2);
+  if (idsrc==parent.id) {
+     deleteelementfromelems(elementsup,data,0,1);
+     console.log("here!");
+  }
+//  parent = document.getElementById("div-start");    
+//  if (ev.target==parent) {
+//     deleteelementfromelems(elementsstart,data,0,1);
+//  }
+
+  if (ev.target.id=="div-starting") {
+        console.log("HERE2");
+	elementsstart.push(document.getElementById(data));
+	console.log(elementsstart.length);
+        parent = document.getElementById("div-starting");  
+        document.getElementById(data).children[1].addEventListener('click', function(event) {
+           deleteelementfromelems(elementsstart,event.target.id,1,0);
+           console.log("asdf delete");
+        });
+
+
+        sety(parent,elementsstart,1);
+   }
+
+
+/*
+  sety(parent,elementsup,0);
+  parent = document.getElementById("div-starting");  
+  sety(parent,elementsstart,1);
+  parent = document.getElementById("div-working");  
+  sety(parent,elementswork,2);
+  parent = document.getElementById("div-ready");  
+  sety(parent,elementsready,3);*/
+
+}
+
+let startindex = 0;
+
+let dragged = null;
+
 /*
 
 let numUpcoming = 0;
@@ -61,6 +236,24 @@ let UpcomingHeight =
 
     //window.alert(theTitleOfTheTask + theDesciptionOfTheTask + theAssignedPerson + theStateOfTheTask);
 
+/*   if (startindex==0) {
+     let parent = document.getElementById("div-upcoming");
+     parent.addEventListener('drop', ev => {
+         dropHandler(ev);
+     }, false);
+     parent.addEventListener('dragover', ev => {
+         dragoverHandler(ev);
+     }, false);
+   
+     parent = document.getElementById("div-starting");
+     parent.addEventListener('drop', ev => {
+         dropHandler(ev);
+    }, false);
+     parent.addEventListener('dragover', ev => {
+         dragoverHandler(ev);
+     }, false);
+     startindex++; 
+ }*/
 
     
 
@@ -87,6 +280,12 @@ let UpcomingHeight =
     newCloseButton.appendChild(document.createTextNode("X"));
     newCloseButton.id = upcoming_button;
 
+    newPElement.draggable = true;
+    newPElement.addEventListener('dragstart', ev => {
+	ev.dataTransfer.setData("text", ev.target.id);
+	dragged = event.target;
+    });
+
     newCloseButton.classList.add("newUpDeleteBut");
 
 
@@ -108,9 +307,12 @@ let UpcomingHeight =
 
     if (theStateOfTheTask === "upcoming") {
       elementsup.push(newPElement);
-      newCloseButton.addEventListener('click', function(event) {
-         deleteelementfromelems(elementsup,event.target.id,0);
-      });
+      newCloseButton.addEventListener('click', deleteup);
+//newCloseButton.addEventListener('click',
+//       function(event) {
+//         deleteelementfromelems(elementsup,event.target.id,0,0);
+//         console.log("upcoming delete");
+//      });
 
       //console.log(newPElement.style.backgroundColor);
       newPElement.style.backgroundColor = "#cfcece";
@@ -119,11 +321,11 @@ let UpcomingHeight =
       if (elementsup.length==1) {
 	 y[0]=pElementMain.offsetHeight;
       }
-
+ 
       let ytmp = y[0].toString()+"px";
 
       newPElement.style.top = ytmp;
-      
+     
       pElementMain.appendChild(newPElement);
 
       y[0]+=newPElement.offsetHeight+20;
@@ -131,7 +333,7 @@ let UpcomingHeight =
     } else if (theStateOfTheTask === "starting") {
       elementsstart.push(newPElement);
       newCloseButton.addEventListener('click', function(event) {
-         deleteelementfromelems(elementsstart,event.target.id,1);
+         deleteelementfromelems(elementsstart,event.target.id,1,0);
       });
       //console.log("start")
 
@@ -155,7 +357,7 @@ let UpcomingHeight =
       console.log("wroking");
       elementswork.push(newPElement);
       newCloseButton.addEventListener('click', function(event) {
-         deleteelementfromelems(elementswork,event.target.id,2);
+         deleteelementfromelems(elementswork,event.target.id,2,0);
       });
       //console.log("start")
 
@@ -185,7 +387,7 @@ let UpcomingHeight =
 
       elementsready.push(newPElement);
       newCloseButton.addEventListener('click', function(event) {
-         deleteelementfromelems(elementsready,event.target.id,3);
+         deleteelementfromelems(elementsready,event.target.id,3,0);
       });
 
       const pElementMain = document.getElementById("div-ready");
