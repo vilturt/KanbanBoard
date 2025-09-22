@@ -163,16 +163,17 @@ function dropHandler(ev) {
 let filename = "";
 let objectURL;
 
-function addtofile(elements,elemadd) {
-  let contents = ""
-  contents += elemadd+"\n";
+function addtofile(elements) {
+  let arr = [];
   for (let i=0;i<elements.length;i++) {
       console.log(elements[i].children[0].innerHTML);
-      contents += elements[i].children[0].innerHTML+"\n";
-      contents += elements[i].children[2].innerHTML.substring(13)+"\n";
-      contents += elements[i].children[3].innerHTML+"\n";
+      let c = {title:elements[i].children[0].innerHTML,
+               desc:elements[i].children[2].innerHTML.substring(13),
+               name:elements[i].children[3].innerHTML};
+      arr.push(c);
   }
-  return contents;
+  console.log(arr);
+  return arr;
 }
 
 async function getNewFileHandle(event) {
@@ -184,13 +185,13 @@ async function getNewFileHandle(event) {
       },
     ],
   };
+  let obj = {"UP":[],"START":[],"WORK":[],"READY":[]};
+  obj["UP"] = addtofile(elementsup);
+  obj["START"] = addtofile(elementsready);
+  obj["WORK"] = addtofile(elementswork);
+  obj["READY"] = addtofile(elementsready);
   try {
-    let contents = "";
-    contents += addtofile(elementsup,"UP");
-    contents += addtofile(elementsstart,"START");
-    contents += addtofile(elementswork,"WORK");
-    contents += addtofile(elementsready,"READY");
-    contents += "END\n";
+    let contents = JSON.stringify(obj);
     const fileHandle = await window.showSaveFilePicker(opts);
     console.log(fileHandle);
     const writable = await fileHandle.createWritable();
@@ -203,7 +204,7 @@ async function getNewFileHandle(event) {
   }
 }
 
-function readonetopicdata(i,lines,topic,topic2,elements,stateoftask) {
+function readonetopicdata(obj,topic,elements,stateoftask) {
   for (j=0;j<elements.length;j++) {
     let elem = elements[j];
     elem.remove();
@@ -226,23 +227,14 @@ function readonetopicdata(i,lines,topic,topic2,elements,stateoftask) {
     parent = document.getElementById("div-ready");
     y[3] = parent.offsetHeight;
   }
-  if (lines[i]!=topic) {
-     return -1;
-  }
-  i++;
   theStateOfTheTask = stateoftask;
-  for (;i<lines.length;i+=3) {
-     if (lines[i]==topic2)
-	break;
-     theTitleOfTheTask = lines[i];
-     theDescriptionOfTheTask = lines[i+1];
-     theAssignedPerson = lines[i+2];
+  for (i=0;i<obj[topic].length;i++) {
+     theTitleOfTheTask = obj[topic][i].title;
+     theDescriptionOfTheTask = obj[topic][i].desc;
+     theAssignedPerson = obj[topic][i].name;
      addNewTask();
   }
-  //console.log(stateoftask+" elementsup: "+elementsup.length);
-  return i;
-}
-   
+}  
 
 async function Loadfile(event) {
   const opts = {
@@ -268,33 +260,15 @@ async function Loadfile(event) {
     console.log(fileData);
     contents = await fileData.text();
     console.log(contents);
-    var lines = contents.split('\n');
+    //var lines = contents.split('\n');
     frombutton = 1;
     let i = 0;
-    i = readonetopicdata(i,lines,"UP","START",elementsup,"upcoming");
-    if (i==-1) {
-       alert("Invalid file");
-       frombutton = 0;
-       return;
-    }
-    i = readonetopicdata(i,lines,"START","WORK",elementsstart,"starting");
-    if (i==-1) {
-       alert("Invalid file");
-       frombutton = 0;
-       return;
-    }
-    i = readonetopicdata(i,lines,"WORK","READY",elementswork,"working");
-    if (i==-1) {
-       alert("Invalid file");
-       frombutton = 0;
-       return;
-    }
-    i = readonetopicdata(i,lines,"READY","END",elementsready,"ready");
-    if (i==-1) {
-       alert("Invalid file");
-       frombutton = 0;
-       return;
-    }    
+    let obj = JSON.parse(contents);
+    console.log(obj);
+    readonetopicdata(obj,"UP",elementsup,"upcoming");
+    readonetopicdata(obj,"START",elementsstart,"starting");
+    readonetopicdata(obj,"WORK",elementswork,"working");
+    readonetopicdata(obj,"READY",elementsready,"ready");
     frombutton = 0;
   } catch (e) {
     console.log("cancelled");
